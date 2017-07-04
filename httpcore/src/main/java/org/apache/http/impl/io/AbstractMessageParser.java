@@ -27,16 +27,7 @@
 
 package org.apache.http.impl.io;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.http.Header;
-import org.apache.http.HttpException;
-import org.apache.http.HttpMessage;
-import org.apache.http.MessageConstraintException;
-import org.apache.http.ParseException;
-import org.apache.http.ProtocolException;
+import org.apache.http.*;
 import org.apache.http.config.MessageConstraints;
 import org.apache.http.io.HttpMessageParser;
 import org.apache.http.io.SessionInputBuffer;
@@ -46,6 +37,10 @@ import org.apache.http.params.HttpParamConfig;
 import org.apache.http.params.HttpParams;
 import org.apache.http.util.Args;
 import org.apache.http.util.CharArrayBuffer;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Abstract base class for HTTP message parsers that obtain input from
@@ -60,7 +55,7 @@ public abstract class AbstractMessageParser<T extends HttpMessage> implements Ht
     private static final int HEADERS      = 1;
 
     private final SessionInputBuffer sessionBuffer;
-    private final MessageConstraints messageConstraints;
+    protected final MessageConstraints messageConstraints;
     private final List<CharArrayBuffer> headerLines;
     protected final LineParser lineParser;
 

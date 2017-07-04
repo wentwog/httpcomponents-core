@@ -30,7 +30,7 @@ package org.apache.http.config;
 import org.apache.http.util.Args;
 
 /**
- * HTTP Message constraints: line length and header count.
+ * HTTP Message constraints: line length, header count, and garbage before status line.
  * <p>
  * Please note that line length is defined in bytes and not characters.
  * This is only relevant however when using non-standard HTTP charsets
@@ -45,11 +45,13 @@ public class MessageConstraints implements Cloneable {
 
     private final int maxLineLength;
     private final int maxHeaderCount;
+    private final int maxGarbageBeforeStatusLine;
 
-    MessageConstraints(final int maxLineLength, final int maxHeaderCount) {
+    MessageConstraints(final int maxLineLength, final int maxHeaderCount, int maxGarbageBeforeStatusLine) {
         super();
         this.maxLineLength = maxLineLength;
         this.maxHeaderCount = maxHeaderCount;
+        this.maxGarbageBeforeStatusLine = maxGarbageBeforeStatusLine;
     }
 
     public int getMaxLineLength() {
@@ -58,6 +60,10 @@ public class MessageConstraints implements Cloneable {
 
     public int getMaxHeaderCount() {
         return maxHeaderCount;
+    }
+
+    public int getMaxGarbageBeforeStatusLine() {
+        return maxGarbageBeforeStatusLine;
     }
 
     @Override
@@ -70,12 +76,13 @@ public class MessageConstraints implements Cloneable {
         final StringBuilder builder = new StringBuilder();
         builder.append("[maxLineLength=").append(maxLineLength)
                 .append(", maxHeaderCount=").append(maxHeaderCount)
+                .append(", maxGarbageBeforeStatusLine=").append(maxGarbageBeforeStatusLine)
                 .append("]");
         return builder.toString();
     }
 
     public static MessageConstraints lineLen(final int max) {
-        return new MessageConstraints(Args.notNegative(max, "Max line length"), -1);
+        return new MessageConstraints(Args.notNegative(max, "Max line length"), -1, -1);
     }
 
     public static MessageConstraints.Builder custom() {
@@ -86,17 +93,20 @@ public class MessageConstraints implements Cloneable {
         Args.notNull(config, "Message constraints");
         return new Builder()
             .setMaxHeaderCount(config.getMaxHeaderCount())
-            .setMaxLineLength(config.getMaxLineLength());
+            .setMaxLineLength(config.getMaxLineLength())
+            .setMaxGarbageBeforeStatusLine(config.getMaxGarbageBeforeStatusLine());
     }
 
     public static class Builder {
 
         private int maxLineLength;
         private int maxHeaderCount;
+        private int maxGarbageBeforeStatusLine;
 
         Builder() {
             this.maxLineLength = -1;
             this.maxHeaderCount = -1;
+            this.maxGarbageBeforeStatusLine = -1;
         }
 
         public Builder setMaxLineLength(final int maxLineLength) {
@@ -109,8 +119,13 @@ public class MessageConstraints implements Cloneable {
             return this;
         }
 
+        public Builder setMaxGarbageBeforeStatusLine(int maxGarbageBeforeStatusLine) {
+            this.maxGarbageBeforeStatusLine = maxGarbageBeforeStatusLine;
+            return this;
+        }
+
         public MessageConstraints build() {
-            return new MessageConstraints(maxLineLength, maxHeaderCount);
+            return new MessageConstraints(maxLineLength, maxHeaderCount, maxGarbageBeforeStatusLine);
         }
 
     }
